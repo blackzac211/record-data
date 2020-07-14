@@ -12,7 +12,8 @@ public class DBManager {
 		try {
 			// Class.forName("oracle.jdbc.OracleDriver");
 			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mysql://20.0.4.26:3306/ipxvr", "fullrec", "Un!s7i!fullrec");
+			// conn = DriverManager.getConnection("jdbc:mysql://20.0.4.26:3306/ipxvr", "fullrec", "Un!s7i!fullrec");
+			conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/blackzac", "root", "unist@1234");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

@@ -22,7 +22,7 @@ import unist.record.common.DBManager;
 import unist.record.common.ExcelManager;
 
 @Controller
-public class GraphController {
+public class GraphController_20200703 {
 	
 	public static void main(String[] args) {
 		try {
@@ -45,9 +45,9 @@ public class GraphController {
     		ResultSet rs_detail;
     		
     		Calendar startDate = Calendar.getInstance();
-    		startDate.set(2020, 2, 22, 0, 0, 0);
+    		startDate.set(2020, 0, 1, 0, 0, 0);
     		Calendar endDate = Calendar.getInstance();
-    		endDate.set(2020, 5, 30, 23, 59, 59);
+    		endDate.set(2020, 3, 20, 23, 59, 59);
     		String startTime;
     		String endTime;
     		String curTime;
@@ -57,7 +57,6 @@ public class GraphController {
     		String curDate;
     		int detailCnt;
     		int resCnt;
-    		int offset = 60;	// 검색 기준(1분)
     		int i;
     		while(true) {
     			if(startDate.getTimeInMillis() > endDate.getTimeInMillis()) {
@@ -66,22 +65,22 @@ public class GraphController {
     			curDate = df.format(startDate.getTime());
     			System.out.println("curDate: " + curDate);
     			
-	    		sql = "SELECT metid, metdate, starttime, endtime, usercnt " + 
-	    				"FROM hero2 " + 
-	    				"WHERE metdate = ? " + 
-	    				"ORDER BY starttime ";
+	    		sql = "SELECT user_id, user_name, rec_startdate, rec_starttime, rec_enddate, rec_endtime " + 
+	    				"FROM rec_data " + 
+	    				"WHERE rec_startDate = ? " + 
+	    				"ORDER BY rec_starttime ";
 	    		pstmt = db.getPreparedStatement(sql);
 	    		pstmt.setString(1, curDate);
 	    		rs = pstmt.executeQuery();
 	    		
 	    		map.put(curDate, 0);
 	    		while(rs.next()) {
-	    			startTime = rs.getString("starttime");
-	    			endTime = rs.getString("endtime");
+	    			startTime = rs.getString("rec_starttime");
+	    			endTime = rs.getString("rec_endtime");
 	    			
-	    			sql_detail = "SELECT SUM(usercnt) " + 
-	        				"FROM hero2 " + 
-	        				"WHERE metdate = ? AND ((starttime >= ? and starttime <= ?) OR (endtime >= ? AND endtime <= ?))"; 
+	    			sql_detail = "SELECT count(*) " + 
+	        				"FROM rec_data " + 
+	        				"WHERE rec_startDate = ? AND ((rec_starttime >= ? and rec_starttime <= ?) OR (rec_endtime >= ? AND rec_endtime <= ?))"; 
 	    			
 	    			pstmt = db.getPreparedStatement(sql_detail);
 	    			pstmt.setString(1, curDate);
@@ -96,14 +95,14 @@ public class GraphController {
 	        		i = 0;
 	        		if(map.get(curDate) < detailCnt) {
 	        			while(true) {
-		        			curTime = String.valueOf(Integer.valueOf(startTime) + (i++ * offset));
+		        			curTime = String.valueOf(Integer.valueOf(startTime) + (i++ * 60));
 		        			if(Integer.valueOf(endTime) < Integer.valueOf(curTime)) {
 		        				break;
 		        			}
 		        			
-		        			sql_detail = "SELECT SUM(usercnt)" + 
-		        					"FROM hero2 " + 
-		        					"WHERE metdate=? AND starttime <= ? AND endtime >= ?";
+		        			sql_detail = "SELECT count(*)" + 
+		        					"FROM rec_data " + 
+		        					"WHERE rec_startDate=? AND rec_starttime <= ? AND rec_endtime >= ?";
 		        			pstmt = db.getPreparedStatement(sql_detail);
 			    			pstmt.setString(1, curDate);
 			    			pstmt.setString(2, curTime);
